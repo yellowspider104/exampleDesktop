@@ -29,11 +29,12 @@ public class Main {
             System.out.println(DataEval3);
         };
 */
-
+        String url_raw = "";
+        JSONObject urlRequest = null;
         File archivo;
         String UrlEndpoint = null;
         String bodyRequestData = null;
-        String urlRequest_get = null;
+        //JSONObject urlRequest_get = null;
         JSONParser jsonParser = new JSONParser();
         FileReader reader = new FileReader("C:\\Users\\maxim\\IdeaProjects\\KarateEjemplo\\src\\main\\java\\org\\KarateEjemplo\\jsonData\\collection_example.postman_collection.json");
         FileWriter escritor =new FileWriter("C:\\Users\\maxim\\IdeaProjects\\KarateEjemplo\\src\\main\\java\\org\\KarateEjemplo\\jsonData\\collection_example.feature");
@@ -97,33 +98,48 @@ public class Main {
             //tipo de request
             JSONObject bodyRequest = (JSONObject) jsonRequest.get("body");
 
+            var urlRequest_get = jsonRequest.get("url");
 
-            if(requestMethod.equals("GET")){
-                urlRequest_get = (String) jsonRequest.get("url");
-            }else{
-                JSONObject urlRequest = (JSONObject) jsonRequest.get("url");
-                 UrlEndpoint = (String) urlRequest.get("raw");
-                 String requestMode = (String) bodyRequest.get("mode");
-                 bodyRequestData = (String) bodyRequest.get("raw");
 
-                System.out.println(requestMode);
-            }
+                if(urlRequest_get instanceof JSONObject){
+                    System.out.println("tipoObjeto");
+                    JSONObject url_obj = (JSONObject) jsonRequest.get("url");
+                    url_raw = (String) url_obj.get("raw");
+                    System.out.println(url_raw);
+                }else if(urlRequest_get instanceof String){
+                    System.out.println("Es de tipo String");
+                    url_raw = (String) jsonRequest.get("url");
+                    System.out.println(url_raw);
+                }else{
+                    System.out.println("Se escapa de las excepciones");
+                }
+
+
+
+            // if(requestMethod.equals("GET")){
+
+            //}else{
+               // 
+
+            //}
 
 
             //REQUEST BODY MODE
 
             //BODY DATA
             //variables dentro del body
-            String bodyRequestData1 = bodyRequestData.replace("{{","<");
-            String bodyRequestData2 = bodyRequestData1.replace("}}",">");
+
 
 
             escritor.write("  Scenario: "+nameScenario+"\n");
             if(requestMethod.equals("GET")){
-                escritor.write("   Given url '"+urlRequest_get+"'\n");
+                escritor.write("   Given url '"+url_raw+"'\n");
             }else{
+                bodyRequestData = (String) bodyRequest.get("raw");
+                String bodyRequestData1 = bodyRequestData.replace("{{","<");
+                String bodyRequestData2 = bodyRequestData1.replace("}}",">");
                 escritor.write("   * def bodyRequest =\n\"\"\"\n"+bodyRequestData2+"\n\"\"\"\n");
-                escritor.write("   Given url '"+UrlEndpoint+"'\n");
+                escritor.write("   Given url '"+url_raw+"'\n");
                 escritor.write("   And request bodyRequest\n");
             }
             escritor.write("   When method "+requestMethod+"\n");
@@ -135,7 +151,6 @@ public class Main {
             System.out.println(nameScenario);
             System.out.println(requestMethod);
             System.out.println(bodyRequestData);
-            System.out.println(UrlEndpoint);
             //
         }
         escritor.close();
