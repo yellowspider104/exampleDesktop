@@ -1,0 +1,203 @@
+{
+	"info": {
+		"_postman_id": "22965332-d927-45c4-9bb7-f827906191d5",
+		"name": "collection_example",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "11854408"
+	},
+	"item": [
+		{
+			"name": "request_example_baja_1",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"{{bodys}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://dummyjson.com/products/add",
+					"protocol": "https",
+					"host": [
+						"dummyjson",
+						"com"
+					],
+					"path": [
+						"products",
+						"add"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": "",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "request_example_alta_2",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"{{bodys}}\",\r\n    \"name\": \"name\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://dummyjson.com/products/add",
+					"protocol": "https",
+					"host": [
+						"dummyjson",
+						"com"
+					],
+					"path": [
+						"products",
+						"add"
+					],
+					"query": [
+						{
+							"key": "0",
+							"value": "1",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "request_example_baja_3",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "headerExample1",
+						"value": "uff",
+						"type": "text"
+					},
+					{
+						"key": "headerExample2",
+						"value": "uff2",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"{{bodys}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://dummyjson.com/products/add",
+					"protocol": "https",
+					"host": [
+						"dummyjson",
+						"com"
+					],
+					"path": [
+						"products",
+						"add"
+					],
+					"query": [
+						{
+							"key": "0",
+							"value": "1",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "request_example_get_4",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "https://dummyjson.com/products/1"
+			},
+			"response": []
+		},
+		{
+			"name": "request_example_get_5",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "header_get_1",
+						"value": "5C142563",
+						"type": "text"
+					}
+				],
+				"url": "https://dummyjson.com/products"
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					"function getRandomInt(max) {\r",
+					"  return Math.floor(Math.random() * max);\r",
+					"}\r",
+					"pm.collectionVariables.set('bodys',getRandomInt(50))"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "bodys",
+			"value": "BMW Pencil",
+			"type": "string"
+		},
+		{
+			"key": "asd",
+			"value": "fffffffff",
+			"type": "string",
+			"disabled": true
+		}
+	]
+}
