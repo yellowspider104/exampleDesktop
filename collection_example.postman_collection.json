@@ -8,12 +8,26 @@
 	"item": [
 		{
 			"name": "request_example_baja_1",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"\r",
+							"prerequest\r",
+							"asdASD"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
 			"request": {
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"title\": \"{{bodys}}\"\r\n}",
+					"raw": "{\r\n    \"title\": \"{{bodys}}\"\r\n    \r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -106,15 +120,6 @@
 						"type": "text"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"title\": \"{{bodys}}\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
 				"url": {
 					"raw": "https://dummyjson.com/products/add",
 					"protocol": "https",
@@ -142,12 +147,33 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"url": "https://dummyjson.com/products/1"
+				"url": {
+					"raw": "https://dummyjson.com/products/1",
+					"protocol": "https",
+					"host": [
+						"dummyjson",
+						"com"
+					],
+					"path": [
+						"products",
+						"1"
+					],
+					"query": [
+						{
+							"key": "5",
+							"value": "5",
+							"disabled": true
+						}
+					]
+				}
 			},
 			"response": []
 		},
 		{
 			"name": "request_example_get_5",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
 			"request": {
 				"method": "GET",
 				"header": [
@@ -157,7 +183,118 @@
 						"type": "text"
 					}
 				],
-				"url": "https://dummyjson.com/products"
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{host}}/products?uff=123&queryParam1=valorqp1",
+					"protocol": "https",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"products"
+					],
+					"query": [
+						{
+							"key": "queryParam2",
+							"value": "abc",
+							"disabled": true
+						},
+						{
+							"key": "uff",
+							"value": "123"
+						},
+						{
+							"key": "queryParam1",
+							"value": "valorqp1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get_example_1",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "https://{{host}}/products"
+			},
+			"response": []
+		},
+		{
+			"name": "get2",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "get3",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "request_example_put_1",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"morpheus\",\r\n    \"job\": \"zion resident\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "https://reqres.in/api/users/2"
+			},
+			"response": []
+		},
+		{
+			"name": "request_example_put_2",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": "https://reqres.in/api/users/2"
+			},
+			"response": []
+		},
+		{
+			"name": "request_example_patch_1",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"morpheus\",\r\n    \"job\": \"zion resident\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "https://reqres.in/api/users/2"
+			},
+			"response": []
+		},
+		{
+			"name": "request_example_patch_2",
+			"request": {
+				"method": "PATCH",
+				"header": []
 			},
 			"response": []
 		}
@@ -169,10 +306,7 @@
 				"type": "text/javascript",
 				"packages": {},
 				"exec": [
-					"function getRandomInt(max) {\r",
-					"  return Math.floor(Math.random() * max);\r",
-					"}\r",
-					"pm.collectionVariables.set('bodys',getRandomInt(50))"
+					"UUFF"
 				]
 			}
 		},
@@ -194,10 +328,9 @@
 			"type": "string"
 		},
 		{
-			"key": "asd",
-			"value": "fffffffff",
-			"type": "string",
-			"disabled": true
+			"key": "host",
+			"value": "dummyjson.com",
+			"type": "string"
 		}
 	]
 }
