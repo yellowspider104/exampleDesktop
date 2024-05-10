@@ -51,6 +51,7 @@ public class Main {
         JSONObject JsonInfoCollection = (JSONObject) empjsonobj.get("info");
         String nombreCollection = (String) JsonInfoCollection.get("name");
 
+
         try{
             archivo = new File(nombreCollection+".feature");
             if (archivo.createNewFile()){
@@ -60,7 +61,9 @@ public class Main {
             System.err.println("No se creo la feature");
         }
 
+        //FEATURE NAME
         escritor.write("Feature: "+nombreCollection+"\n");
+        //COLLECTION VAR
         escritor.write("\n  Background:\n");
         for (int i = 0 ;i < JsonArrayVar.size(); i++){
             JSONObject jsonVar = (JSONObject) JsonArrayVar.get(i);
@@ -71,6 +74,10 @@ public class Main {
                 escritor.write("* def "+nombreVar+" = '"+valorVar+"'\n");
             }
         }
+
+
+
+
 
         escritor.write("  * def preScript =\n\"\"\"\n");
         for (int i = 0 ;i < JsonArrayEvent.size(); i++){
@@ -87,77 +94,136 @@ public class Main {
         }
         escritor.write("\n\"\"\"\n\n\n");
 
-
+//ESCRITURA DEL SCENARIO
         for (int i = 0 ;i < JsonArrayInfo.size(); i++){
 
+//REASIGNAR LAS VARIABLES , INICIALIZARLAS AL PRINCIPIO
             JSONObject jsonData = (JSONObject) JsonArrayInfo.get(i);
             String nameScenario = (String) jsonData.get("name");
-            //nombre del scenario o endpoint
+            //nombre del scenario
             JSONObject jsonRequest = (JSONObject) jsonData.get("request");
+
+            JSONArray jsonEventRequest = (JSONArray) jsonData.get("event");
+
             String requestMethod = (String) jsonRequest.get("method");
-            //tipo de request
+            boolean metodosActualesConBody = requestMethod.equals("POST") || requestMethod.equals("PATCH") || requestMethod.equals("PUT");
+            boolean contieneBody = true;
             JSONObject bodyRequest = (JSONObject) jsonRequest.get("body");
-
             var urlRequest_get = jsonRequest.get("url");
+            System.out.println(bodyRequest);
 
 
-                if(urlRequest_get instanceof JSONObject){
-                    System.out.println("tipoObjeto");
-                    JSONObject url_obj = (JSONObject) jsonRequest.get("url");
-                    url_raw = (String) url_obj.get("raw");
-                    System.out.println(url_raw);
-                }else if(urlRequest_get instanceof String){
-                    System.out.println("Es de tipo String");
-                    url_raw = (String) jsonRequest.get("url");
-                    System.out.println(url_raw);
-                }else{
-                    System.out.println("Se escapa de las excepciones");
-                }
+            if (bodyRequest == null){
+                contieneBody=false;
+                System.out.println("No contiene body por lo cual o esta recien inicializado o es un get");
+            }
 
 
 
-            // if(requestMethod.equals("GET")){
-
-            //}else{
-               // 
-
-            //}
-
-
-            //REQUEST BODY MODE
-
-            //BODY DATA
-            //variables dentro del body
-
-
-
+            //NOMBRE SCENARIO
             escritor.write("  Scenario: "+nameScenario+"\n");
-            if(requestMethod.equals("GET")){
-                escritor.write("   Given url '"+url_raw+"'\n");
-            }else{
+
+            //Condicionar PreScript
+
+           /* escritor.write("  * def preRequestScript =\n\"\"\"\n");
+            for (int l = 0 ;l < jsonEventRequest.size(); l++){
+                JSONObject jsonEventR = (JSONObject) JsonArrayEvent.get(l);
+                String tipoEvento = (String) jsonEventR.get("listen");
+
+                if (tipoEvento.equals("prerequest")){
+                    JSONObject scriptArray = (JSONObject) jsonEventR.get("script");
+                    JSONArray preScriptFuncion = (JSONArray) scriptArray.get("exec");
+                    for (int j = 0 ;j < preScriptFuncion.size(); j++){
+                        escritor.write(preScriptFuncion.get(j).toString());
+                    }
+                }
+            }*/
+            //ARREGLAR
+
+            //Headers
+
+            JSONArray headerRequest = (JSONArray) jsonRequest.get("header");
+            for (int j = 0 ;j < headerRequest.size(); j++){
+                JSONObject jsonHeader = (JSONObject) headerRequest.get(j);
+                Boolean estadoHeader = (Boolean) jsonHeader.get("disabled");
+                String nombreHeader = (String) jsonHeader.get("key");
+                String valorHeader =  (String) jsonHeader.get("value");
+                if (estadoHeader == null) {
+                    escritor.write("  * header "+nombreHeader+" = '"+valorHeader+"'\n");
+                    System.out.println(nombreHeader+valorHeader);
+                }
+            }
+
+            //SI EL REQUEST ES POST,GET,PUT,PATH SE GENERA EL BODY Y SE REMPLAZA LOS PARAMETROS PARA ASIGNAR LAS VARIABLES DENTRO DEL BODY
+            if(contieneBody){
+            if(metodosActualesConBody){
+
                 bodyRequestData = (String) bodyRequest.get("raw");
+
+                //pendiente a cambio , poca validacion del dato
                 String bodyRequestData1 = bodyRequestData.replace("{{","<");
                 String bodyRequestData2 = bodyRequestData1.replace("}}",">");
                 escritor.write("   * def bodyRequest =\n\"\"\"\n"+bodyRequestData2+"\n\"\"\"\n");
-                escritor.write("   Given url '"+url_raw+"'\n");
+            }
+                System.out.println("REQUEST GET INGRESADA CON BODY VACIO O NULO , SE IGNORA BODY");
+            }
+
+
+
+            //SIEMPRE QUE LA URL SEA UN OBJETO, DADO QUE PUEDE VENIR EN TEXTO PLANO O EN UN OBJETO
+            if(urlRequest_get instanceof JSONObject){
+                System.out.println("tipoObjeto");
+                JSONObject url_obj = (JSONObject) jsonRequest.get("url");
+                url_raw = (String) url_obj.get("raw");
+                String url_raw_mod = url_raw.replace("{{","'+");
+                String url_raw_mod2 = url_raw_mod.replace("}}","+'");
+
+                //ESCRITURA URL
+                escritor.write("   Given url '"+url_raw_mod2+"'\n");
+
+                JSONArray paramsArray = (JSONArray) url_obj.get("query");
+                //En caso de necesitar params , aca esta el code pero la url los trae
+                /*for (int j = 0 ;j < paramsArray.size(); j++){
+                    JSONObject JsonParam = (JSONObject) paramsArray.get(j);
+                    Boolean estadoParam = (Boolean) JsonParam.get("disabled");
+                    String nombreParam = (String) JsonParam.get("key");
+                    String valorParam =  (String) JsonParam.get("value");
+                    if (estadoParam == null) {
+                        escritor.write("  And param "+nombreParam+" = '"+valorParam+"'\n");
+                        System.out.println(nombreParam+valorParam);
+                    }
+                }*/
+            }else if(urlRequest_get instanceof String){
+                //REVISAR Y LIMPIAR
+                System.out.println("Es de tipo String");
+                url_raw = (String) jsonRequest.get("url");
+                String url_raw_mod = url_raw.replace("{{","'+");
+                String url_raw_mod2 = url_raw_mod.replace("}}","'+");
+                escritor.write("   Given url '"+url_raw_mod2+"'\n");
+            }else{
+                System.out.println("Se escapa de las excepciones");
+            }
+
+            //pasando parametros de body
+            if(metodosActualesConBody){
                 escritor.write("   And request bodyRequest\n");
             }
+
             escritor.write("   When method "+requestMethod+"\n");
             escritor.write("   Then status 200\n");
             escritor.write("   And print response\n");
             escritor.write("\n\n\n");
 
 
-            System.out.println(nameScenario);
-            System.out.println(requestMethod);
-            System.out.println(bodyRequestData);
-            //
-        }
-        escritor.close();
+
+
+
 
         //String name = (String) empjsonobj.get("name");
 
 
 
     }
+        escritor.close();
+}
 }
