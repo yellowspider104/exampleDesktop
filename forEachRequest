@@ -1,0 +1,141 @@
+package org.KarateEjemplo;
+
+
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+import java.io.*;
+
+public class forEachRequest {
+    public static void main(String[] args) throws IOException, ParseException {
+
+        boolean contieneBody = true;
+        String url_raw = "";
+        JSONObject urlRequest = null;
+        File archivo;
+        String UrlEndpoint = null;
+        String bodyRequestData = null;
+        FileWriter escritor;
+        JSONParser jsonParser = new JSONParser();
+        //ubicar en una mejor posicion dentro de la estructura de carpetas
+        FileReader reader = new FileReader("C:\\Users\\maxim\\IdeaProjects\\KarateEjemplo\\src\\main\\java\\org\\KarateEjemplo\\jsonData\\collection_post_example.postman_collection.json");
+
+
+
+
+        Object obj=jsonParser.parse(reader);
+        JSONObject empjsonobj = (JSONObject)obj;
+        JSONArray JsonArrayInfo = (JSONArray) empjsonobj.get("item");
+        JSONArray JsonArrayEvent = (JSONArray) empjsonobj.get("event");
+        JSONArray JsonArrayVar = (JSONArray) empjsonobj.get("variable");
+        JSONObject JsonInfoCollection = (JSONObject) empjsonobj.get("info");
+        String nombreCollection = (String) JsonInfoCollection.get("name");
+
+        //Se genera carpeta con el nombre de la collection
+        File carpeta = new File(nombreCollection);
+        if (!carpeta.exists()) {
+            if (carpeta.mkdirs()) {
+                System.out.println("Carpeta Collection creada");
+            } else {
+                System.out.println("Error al crear directorio , revise sus permisos");
+            }
+        }
+
+
+        for (int i = 0 ;i < JsonArrayInfo.size(); i++){
+
+            JSONObject jsonData = (JSONObject) JsonArrayInfo.get(i);
+            String nameScenario = (String) jsonData.get("name");
+
+
+
+            System.out.println("Nombre del scenario "+nameScenario);
+            try{
+                archivo = new File(nombreCollection+"/"+nameScenario+".feature");
+                if (archivo.createNewFile()){
+                    System.out.println("Se ha creado la feature");
+                    escritor =new FileWriter(archivo.getAbsolutePath());
+                    escritor.write("Feature: "+nameScenario+"\n");
+                    escritor.write("\n  Background:\n");
+                    escritor.write("\n  * configure ssl = true \n");
+                    escritor.write("\n\n");
+                    escritor.write("  Scenario: "+nameScenario+"\n");
+
+                    JSONObject jsonRequest = (JSONObject) jsonData.get("request");
+                    JSONArray headerRequest = (JSONArray) jsonRequest.get("header");
+                    String requestMethod = (String) jsonRequest.get("method");
+                    JSONObject bodyRequest = (JSONObject) jsonRequest.get("body");
+                    boolean metodosActualesConBody = requestMethod.equals("POST") || requestMethod.equals("PATCH") || requestMethod.equals("PUT");
+                    var urlRequest_get = jsonRequest.get("url");
+
+                    for (int j = 0 ;j < headerRequest.size(); j++){
+                        JSONObject jsonHeader = (JSONObject) headerRequest.get(j);
+                        Boolean estadoHeader = (Boolean) jsonHeader.get("disabled");
+                        String nombreHeader = (String) jsonHeader.get("key");
+                        String valorHeader =  (String) jsonHeader.get("value");
+                        if (estadoHeader == null) {
+                            escritor.write("  * header "+nombreHeader+" = '"+valorHeader+"'\n");
+                            System.out.println(nombreHeader+valorHeader);
+                        }
+                    }
+                    //Fix this plz, arreglar la logica
+                    if(contieneBody){
+                        if(metodosActualesConBody){
+
+                            bodyRequestData = (String) bodyRequest.get("raw");
+
+                            //pendiente a cambio , poca validacion del dato
+                            String bodyRequestData1 = bodyRequestData.replace("{{","<");
+                            String bodyRequestData2 = bodyRequestData1.replace("}}",">");
+                            escritor.write("   * def bodyRequest =\n\"\"\"\n"+bodyRequestData2+"\n\"\"\"\n");
+                        }
+                        System.out.println("REQUEST GET INGRESADA CON BODY VACIO O NULO , SE IGNORA BODY");
+                    }
+
+                    //SIEMPRE QUE LA URL SEA UN OBJETO, DADO QUE PUEDE VENIR EN TEXTO PLANO O EN UN OBJETO
+                    if(urlRequest_get instanceof JSONObject){
+                        System.out.println("tipoObjeto");
+                        JSONObject url_obj = (JSONObject) jsonRequest.get("url");
+                        url_raw = (String) url_obj.get("raw");
+                        String url_raw_mod = url_raw.replace("{{","'+");
+                        String url_raw_mod2 = url_raw_mod.replace("}}","+'");
+                        //ESCRITURA URL
+                        escritor.write("   Given url '"+url_raw_mod2+"'\n");
+                    }else if(urlRequest_get instanceof String){
+                        //REVISAR Y LIMPIAR
+                        System.out.println("Es de tipo String");
+                        url_raw = (String) jsonRequest.get("url");
+                        String url_raw_mod = url_raw.replace("{{","'+");
+                        String url_raw_mod2 = url_raw_mod.replace("}}","'+");
+                        escritor.write("   Given url '"+url_raw_mod2+"'\n");
+                    }else{
+                        System.out.println("Se escapa de las excepciones");
+                    }
+
+                    //pasando parametros de body
+                    if(metodosActualesConBody){
+                        escritor.write("   And request bodyRequest\n");
+                    }
+
+                    escritor.write("   When method "+requestMethod+"\n");
+                    escritor.write("   Then status 200\n");
+                    escritor.write("   And print response\n");
+                    escritor.write("\n\n\n");
+
+                    escritor.write("Prueba c:");
+
+
+                    escritor.close();
+                }
+            }catch (IOException e){
+                System.err.println("No se creo la feature");
+            }
+        }
+
+
+
+    }
+}
