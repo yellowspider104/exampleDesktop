@@ -13,9 +13,7 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"\r",
-							"prerequest\r",
-							"asdASD"
+							""
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -24,10 +22,21 @@
 			],
 			"request": {
 				"method": "POST",
-				"header": [],
+				"header": [
+					{
+						"key": "header_example_1",
+						"value": "header_example_1_response",
+						"type": "text"
+					},
+					{
+						"key": "header_example_2",
+						"value": "header_example_2_response",
+						"type": "text"
+					}
+				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"title\": \"{{bodys}}\"\r\n    \r\n}",
+					"raw": "{\r\n    \"email\": \"eve.holt@reqres.in\",\r\n    \"password\": \"pistol\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -35,15 +44,15 @@
 					}
 				},
 				"url": {
-					"raw": "https://dummyjson.com/products/add",
+					"raw": "https://reqres.in/api/register",
 					"protocol": "https",
 					"host": [
-						"dummyjson",
-						"com"
+						"reqres",
+						"in"
 					],
 					"path": [
-						"products",
-						"add"
+						"api",
+						"register"
 					],
 					"query": [
 						{
@@ -75,7 +84,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"title\": \"{{bodys}}\",\r\n    \"name\": \"name\"\r\n}",
+					"raw": "{\r\n    \"email\": \"eve.holt@reqres.in\",\r\n    \"password\": \"cityslicka\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -83,53 +92,15 @@
 					}
 				},
 				"url": {
-					"raw": "https://dummyjson.com/products/add",
+					"raw": "https://reqres.in/api/login",
 					"protocol": "https",
 					"host": [
-						"dummyjson",
-						"com"
+						"reqres",
+						"in"
 					],
 					"path": [
-						"products",
-						"add"
-					],
-					"query": [
-						{
-							"key": "0",
-							"value": "1",
-							"disabled": true
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "request_example_baja_3",
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "headerExample1",
-						"value": "uff",
-						"type": "text"
-					},
-					{
-						"key": "headerExample2",
-						"value": "uff2",
-						"type": "text"
-					}
-				],
-				"url": {
-					"raw": "https://dummyjson.com/products/add",
-					"protocol": "https",
-					"host": [
-						"dummyjson",
-						"com"
-					],
-					"path": [
-						"products",
-						"add"
+						"api",
+						"login"
 					],
 					"query": [
 						{
@@ -171,9 +142,6 @@
 		},
 		{
 			"name": "request_example_get_5",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
 			"request": {
 				"method": "GET",
 				"header": [
@@ -183,20 +151,12 @@
 						"type": "text"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
 				"url": {
-					"raw": "https://{{host}}/products?uff=123&queryParam1=valorqp1",
+					"raw": "https://dummyjson.com/products?uff=123&queryParam1=valorqp1",
 					"protocol": "https",
 					"host": [
-						"{{host}}"
+						"dummyjson",
+						"com"
 					],
 					"path": [
 						"products"
@@ -221,35 +181,21 @@
 			"response": []
 		},
 		{
-			"name": "get_example_1",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": "https://{{host}}/products"
-			},
-			"response": []
-		},
-		{
-			"name": "get2",
-			"request": {
-				"method": "GET",
-				"header": []
-			},
-			"response": []
-		},
-		{
-			"name": "get3",
-			"request": {
-				"method": "GET",
-				"header": []
-			},
-			"response": []
-		},
-		{
 			"name": "request_example_put_1",
 			"request": {
 				"method": "PUT",
-				"header": [],
+				"header": [
+					{
+						"key": "put_header_example_1",
+						"value": "put_header_example_1_response",
+						"type": "text"
+					},
+					{
+						"key": "put_header_example_2",
+						"value": "put_header_example_2_response",
+						"type": "text"
+					}
+				],
 				"body": {
 					"mode": "raw",
 					"raw": "{\r\n    \"name\": \"morpheus\",\r\n    \"job\": \"zion resident\"\r\n}",
@@ -276,7 +222,13 @@
 			"name": "request_example_patch_1",
 			"request": {
 				"method": "PATCH",
-				"header": [],
+				"header": [
+					{
+						"key": "header_patch_1",
+						"value": "header_patch_1_response",
+						"type": "text"
+					}
+				],
 				"body": {
 					"mode": "raw",
 					"raw": "{\r\n    \"name\": \"morpheus\",\r\n    \"job\": \"zion resident\"\r\n}",
@@ -294,7 +246,8 @@
 			"name": "request_example_patch_2",
 			"request": {
 				"method": "PATCH",
-				"header": []
+				"header": [],
+				"url": "https://reqres.in/api/users/2"
 			},
 			"response": []
 		}
@@ -306,7 +259,7 @@
 				"type": "text/javascript",
 				"packages": {},
 				"exec": [
-					"UUFF"
+					""
 				]
 			}
 		},
