@@ -12,7 +12,6 @@ import java.io.*;
 public class forEachRequest {
     public static void main(String[] args) throws IOException, ParseException {
 
-        boolean contieneBody = true;
         String url_raw = "";
         JSONObject urlRequest = null;
         File archivo;
@@ -21,7 +20,7 @@ public class forEachRequest {
         FileWriter escritor;
         JSONParser jsonParser = new JSONParser();
         //ubicar en una mejor posicion dentro de la estructura de carpetas
-        FileReader reader = new FileReader("C:\\Users\\maxim\\IdeaProjects\\KarateEjemplo\\src\\main\\java\\org\\KarateEjemplo\\jsonData\\collection_post_example.postman_collection.json");
+        FileReader reader = new FileReader("C:\\Users\\maxim\\IdeaProjects\\KarateEjemplo\\src\\main\\java\\org\\KarateEjemplo\\jsonData\\collection_example.postman_collection.json");
 
 
 
@@ -43,8 +42,17 @@ public class forEachRequest {
                 System.out.println("Error al crear directorio , revise sus permisos");
             }
         }
+boolean TokenExistente = false;
+//VALIDAR SI EXISTE DENTRO DE LOS REQUEST UNA LLAMADA TOKEN
+        for (int i = 0 ;i < JsonArrayInfo.size(); i++) {
 
-
+            JSONObject jsonData = (JSONObject) JsonArrayInfo.get(i);
+            String nameScenario = (String) jsonData.get("name");
+            if(nameScenario.equals("TOKEN")){
+                TokenExistente=true;
+            }
+        }
+        System.out.println(TokenExistente);
         for (int i = 0 ;i < JsonArrayInfo.size(); i++){
 
             JSONObject jsonData = (JSONObject) JsonArrayInfo.get(i);
@@ -61,6 +69,10 @@ public class forEachRequest {
                     escritor.write("Feature: "+nameScenario+"\n");
                     escritor.write("\n  Background:\n");
                     escritor.write("\n  * configure ssl = true \n");
+                    if(!nameScenario.equals("TOKEN") && TokenExistente){
+                        escritor.write("   * call read('TOKEN.feature')\n");
+                        escritor.write("   * header Authorization = authToken\n");
+                    }
                     escritor.write("\n\n");
                     escritor.write("  Scenario: "+nameScenario+"\n");
 
@@ -69,6 +81,7 @@ public class forEachRequest {
                     String requestMethod = (String) jsonRequest.get("method");
                     JSONObject bodyRequest = (JSONObject) jsonRequest.get("body");
                     boolean metodosActualesConBody = requestMethod.equals("POST") || requestMethod.equals("PATCH") || requestMethod.equals("PUT");
+                    boolean contieneBody = true;
                     var urlRequest_get = jsonRequest.get("url");
 
                     for (int j = 0 ;j < headerRequest.size(); j++){
@@ -76,24 +89,52 @@ public class forEachRequest {
                         Boolean estadoHeader = (Boolean) jsonHeader.get("disabled");
                         String nombreHeader = (String) jsonHeader.get("key");
                         String valorHeader =  (String) jsonHeader.get("value");
+
                         if (estadoHeader == null) {
-                            escritor.write("  * header "+nombreHeader+" = '"+valorHeader+"'\n");
-                            System.out.println(nombreHeader+valorHeader);
+                            if(nombreHeader.equals("Authorization") && !(nameScenario.equals("TOKEN"))){
+                                System.out.println("ESTE SCENARIO TIENE AUTHORIZATION Y NO ES EL TOKEN POR LO TANTO NO SE ESCRIBE");
+
+                            }else {
+                                escritor.write("  * header " + nombreHeader + " = '" + valorHeader + "'\n");
+                                System.out.println("ESTE CASO NO ES EL TOKEN Y SE ESCRIBE SU AUTORIZACION");
+                                System.out.println(nombreHeader + valorHeader);
+                            }
                         }
                     }
-                    //Fix this plz, arreglar la logica
+
+                    if (bodyRequest == null){
+                        contieneBody=false;
+                        System.out.println("No contiene body por lo cual o esta recien inicializado o es un get");
+                    }
                     if(contieneBody){
                         if(metodosActualesConBody){
+                            String bodyRequestType = (String) bodyRequest.get("mode");
+                            
+                            if(bodyRequestType.equals("raw")){
+                                bodyRequestData = (String) bodyRequest.get("raw");
+                                escritor.write("   * def bodyRequest =\n\"\"\"\n"+bodyRequestData+"\n\"\"\"\n");
+                            } else if (bodyRequestType.equals("urlencoded")) {
+                                JSONArray JsonArrayInfoBodyENCONDED = (JSONArray) bodyRequest.get("urlencoded");
 
-                            bodyRequestData = (String) bodyRequest.get("raw");
+                                for (int Z = 0 ;Z < JsonArrayInfoBodyENCONDED.size(); Z++){
+                                    JSONObject jsonDataEncoded = (JSONObject) JsonArrayInfoBodyENCONDED.get(i);
+                                    String key = (String) jsonDataEncoded.get("key");
+                                    String value = (String) jsonDataEncoded.get("value");
+                                    escritor.write("   And form field "+key+" = "+"'"+value+"'");
+                                    escritor.write("\n");
+                                    System.out.println(key);
+                                    System.out.println(value);
+                                }
+                                System.out.println("ES EL TOKEN");
+                            }else{
+                                System.out.println("N/A");
+                            }
 
-                            //pendiente a cambio , poca validacion del dato
-                            String bodyRequestData1 = bodyRequestData.replace("{{","<");
-                            String bodyRequestData2 = bodyRequestData1.replace("}}",">");
-                            escritor.write("   * def bodyRequest =\n\"\"\"\n"+bodyRequestData2+"\n\"\"\"\n");
+
                         }
                         System.out.println("REQUEST GET INGRESADA CON BODY VACIO O NULO , SE IGNORA BODY");
                     }
+
 
                     //SIEMPRE QUE LA URL SEA UN OBJETO, DADO QUE PUEDE VENIR EN TEXTO PLANO O EN UN OBJETO
                     if(urlRequest_get instanceof JSONObject){
@@ -116,16 +157,29 @@ public class forEachRequest {
                     }
 
                     //pasando parametros de body
+                    if(contieneBody){
                     if(metodosActualesConBody){
-                        escritor.write("   And request bodyRequest\n");
+                        String bodyRequestType = (String) bodyRequest.get("mode");
+
+                        if(bodyRequestType.equals("raw")){
+                            escritor.write("     And request bodyRequest\n");
+                        } else if (bodyRequestType.equals("urlencoded")) {
+                            System.out.println("ES EL TOKEN");
+                        }else{
+                            System.out.println("N/A");
+                        }
+
+
+                    }
                     }
 
                     escritor.write("   When method "+requestMethod+"\n");
                     escritor.write("   Then status 200\n");
                     escritor.write("   And print response\n");
+                    if(nameScenario.equals("TOKEN")){
+                        escritor.write("   * def authToken = 'Bearer ' + response.access_token\n");
+                    }
                     escritor.write("\n\n\n");
-
-                    escritor.write("Prueba c:");
 
 
                     escritor.close();
